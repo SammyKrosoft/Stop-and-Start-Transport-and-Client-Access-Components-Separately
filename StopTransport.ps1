@@ -103,7 +103,7 @@ For ($i=1;$i -lt 20;$i++){
 	Sleep 1
 }
 Write-Host "Stopping Transport Service. Any messages left in the queue will be distributed on next server start"
-
+Stop-service MSExchangeTransport -Force
 
 <# -------------------------- CLEANUP VARIABLES -------------------------- #>
 
