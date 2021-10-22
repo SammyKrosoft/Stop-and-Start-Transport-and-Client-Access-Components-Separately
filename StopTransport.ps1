@@ -1,31 +1,19 @@
 <#
 .SYNOPSIS
-    Quick description of this script
+    This scripts disable Transport component, restarts the Transport service to accelerate the
+    Queues drain, and stops the Transport service after 20 seconds.
 
-.DESCRIPTION
-    Longer description of what this script does
-
-.PARAMETER FirstNumber
-    This parameter does blablabla
+.PARAMETER ServerName
+    Netbios or FQDN name of the server where to stop the Transport Service.
 
 .PARAMETER CheckVersion
     This parameter will just dump the script current version.
 
-.INPUTS
-    None. You cannot pipe objects to that script.
-
-.OUTPUTS
-    None for now
-
 .EXAMPLE
-.\Do-Something.ps1
-This will launch the script and do someting
+.\StopTransport.ps1 -ServerName E2016-01
+This will stop the Transport component, restart Transport service and stop Transport service 
+after 20 seconds on E2016-01
 
-.EXAMPLE
-.\Do-Something.ps1 -CheckVersion
-This will dump the script name and current version like :
-SCRIPT NAME : Do-Something.ps1
-VERSION : v1.0
 
 .NOTES
 None
@@ -38,7 +26,7 @@ None
 #>
 [CmdLetBinding(DefaultParameterSetName = "NormalRun")]
 Param(
-    [Parameter(Mandatory = $True, Position = 1, ParameterSetName = "NormalRun")][int]$ServerName,
+    [Parameter(Mandatory = $True, Position = 1, ParameterSetName = "NormalRun")][string]$ServerName,
     [Parameter(Mandatory = $false, Position = 3, ParameterSetName = "CheckOnly")][switch]$CheckVersion
 )
 
@@ -111,7 +99,7 @@ Write-Log "Restarting Transport Service to accelerate queues draining..."
 Restart-Service MSExchangeTransport
 Write-Log "Waiting 20 seconds to drain the queues before stopping Transport Service..."
 For ($i=1;$i -lt 20;$i++){
-	Write-Host "Stopping" -ForegroundColor green
+	Write-Host "$i" -ForegroundColor green
 	Sleep 1
 }
 Write-Host "Stopping Transport Service. Any messages left in the queue will be distributed on next server start"
@@ -125,7 +113,7 @@ Write-Host "Stopping Transport Service. Any messages left in the queue will be d
 Write-Log "************************** Script End **************************"
 $stopwatch.Stop()
 $msg = "`n`nThe script took $([math]::round($($StopWatch.Elapsed.TotalSeconds),2)) seconds to execute..."
-Write-Host $msg
+Write-Log $msg
 $msg = $null
 $StopWatch = $null
 <# ---------------- /SCRIPT_FOOTER (NOTHING BEYOND THIS POINT) ----------- #>
