@@ -94,16 +94,22 @@ function Write-Log
 Write-Log "************************** Script Start **************************"
 <# /EXECUTIONS #>
 
+Write-Log "Setting HubTransport component to Draining state..."
 Set-ServerComponentState $ServerName -Component HubTransport -State Draining -Requester Maintenance
+
+$CmpState = Get-ServerComponentState $ServerName -component HubTransport
+$StrCmpState = $CmpState | Out-String
+Write-log $StrCmpState
+
 Write-Log "Restarting Transport Service to accelerate queues draining..."
 Restart-Service MSExchangeTransport
 Write-Log "Waiting 20 seconds to drain the queues before stopping Transport Service..."
 For ($i=1;$i -lt 20;$i++){
-	Write-Host "$i" -ForegroundColor green
-	Sleep 1
+    Write-Progress -Activity "Waiting 20 seconds" -PercentComplete $($i/20*100)
+   	Sleep 1
 }
-Write-Log "Stopping Transport Service. Any messages left in the queue will be distributed on next server start"
-Stop-service MSExchangeTransport -Force
+Write-Host "Stopping Transport Service. Any messages left in the queue will be distributed on next server start"
+Stop-Service MSExchangeTransport -Force
 
 <# -------------------------- CLEANUP VARIABLES -------------------------- #>
 
