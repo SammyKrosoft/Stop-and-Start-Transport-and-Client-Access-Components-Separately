@@ -96,7 +96,7 @@ Write-Log "************************** Script Start **************************"
 
 
 Write-Log "Starting Transport Service..."
-Stop-service MSExchangeTransport -Force
+Start-service MSExchangeTransport
 
 Write-Log "Setting Transport component to Active..."
 Set-ServerComponentState $ServerName -Component HubTransport -State Active -Requester Maintenance
@@ -104,7 +104,7 @@ Set-ServerComponentState $ServerName -Component HubTransport -State Active -Requ
 $CmpState = Get-ServerComponentState $ServerName -component HubTransport
 
 if ($CmpState.State -ne "Active"){
-    Write-Log "Component state not Active ... try again"
+    Write-Log "Component state **NOT** Active ... try again"
 } else {
     Write-Log "Component state Active !"
 }
